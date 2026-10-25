@@ -9,51 +9,22 @@ El proyecto implementa una arquitectura híbrida sobre **Apache Flink** y **AWS 
 ## Arquitectura del Sistema
 
 El entorno distribuido se divide en dos nodos conectados en red local (LAN):
-1. **Nodo Principal (Clúster Base VM):** Ejecuta el clúster de Apache Flink (`JobManager` + `TaskManagers` dinámicos en Docker) y el **Orquestador Reactivo**, el cual monitorea el caudal por operador vía REST API y escala horizontalmente los contenedores.
-2. **Nodo Secundario (Entorno Serverless):** Ejecuta **LocalStack** en Docker exponiendo la función `BurstHandler` (AWS Lambda), encargada de absorber y pre-procesar los lotes excedentes durante el *cold-start* de escalado del clúster local (~25 s).
+1. **Nodo Principal PC (Clúster Base VM):** Ejecuta el clúster de Apache Flink (`JobManager` + `TaskManagers` en Docker) y el **Orquestador**, el cual monitorea el caudal por operador vía REST API y escala horizontalmente los contenedores.
+2. **Nodo Secundario Notebook (Entorno Serverless):** Ejecuta **LocalStack** en Docker utilizando la función `BurstHandler` (AWS Lambda), encargada de absorber y pre-procesar los lotes excedentes durante el *cold-start* de escalado del clúster local (~25 s).
 
 ---
 
 ## Estructura del Repositorio
 
-> *(Completa o ajusta los nombres de tus archivos en la lista inferior según cómo los tengas nombrados en tus carpetas)*
-
 ```text
 ├── README.md
-├── cluster-flink/                  # Nodo Principal (PC) - Clúster Base y Orquestador
-│   ├── docker-compose.yml          # Definición de JobManager y TaskManagers (Flink 1.18)
-│   ├── Dockerfile                  # Imagen personalizada con PyFlink y dependencias
-│   ├── orquestador.py              # [ESPACIO: Nombre de tu script del Orquestador Reactivo]
-│   └── jobs/
-│       ├── fase1_poc/              # Scripts de la Prueba de Concepto (Fase 1)
-│       │   ├── [ESPACIO: ej. job_baseline.py]
-│       │   └── [ESPACIO: ej. job_serverless_hibrido.py]
-│       └── fase2_nexmark/          # Consultas del Benchmark Estándar NexMark (Fase 2)
-│           ├── [ESPACIO: ej. nexmark_q1_stateless.py]
-│           └── [ESPACIO: ej. nexmark_q4_stateful.py]
-│
-├── serverless-node/                # Nodo Secundario (Notebook) - AWS Lambda en LocalStack
-│   ├── docker-compose.yml          # Configuración del contenedor LocalStack y Docker Socket
-│   ├── lambda_function.py          # Lógica del BurstHandler (Stateless / Stateful Micro-batch)
-│   └── deploy.sh                   # Script de empaquetado (.zip) y registro automático en Lambda
-│
-├── logs-experimentales/            # Registros crudos (.log) de las pruebas de 4 minutos
-│   ├── fase1_poc/
-│   │   ├── Resultado Baseline (1).log
-│   │   ├── Resultado Baseline Carga Extrema.log
-│   │   ├── Resultado Basaline Intermitente.log
-│   │   ├── Resultado Serverless Carga Extrema.log
-│   │   ├── Resultado Serverless Intermitente.log
-│   │   ├── Resultado Serverless Tolerancia a Fallos.log
-│   │   └── Resultado Test Serverless (1).log
-│   └── fase2_nexmark/
-│       ├── test_nexmark_q1_stateless.log
-│       ├── test_nexmark_q1_stateless_bifurcado.log
-│       ├── Resultado_NexMark_Q1_Bifurcado_Final.log
-│       └── Resultado_NexMark_Q4_Stateful_Final.log
-│
-└── analisis-y-graficos/            # Scripts de evaluación estadística y figuras del reporte
-    ├── [ESPACIO: ej. generar_graficos.py]
-    ├── grafico_fase1_comparativa_log.png
-    ├── grafico_percentiles_comparativa.png
-    └── grafico_fase2_nexmark_q1_q4.png
+├── Códigos PC Local Fase 1.rar     # Nodo Principal (PC) - Contiene todos los códigos y scripts utilizados para todas las pruebas realizadas en la Fase 1.
+├── Códigos PC Local Fase 2.rar     # Nodo Principal (PC) - Contiene todos los códigos y scripts utilizados para las dos pruebas realizadas en la Fase 2.
+├── Códigos Notebook (Serverless).rar   # Nodo Secundario (Notebook) - Contiene todos los códigos y scripts utilizados para el procesamiento en Serverless para ambas Fases del proyecto.
+├── Imagenes PC Fase 1 (Local).rar  # Contiene imágenes como evidencias del correcto funcionamiento de las pruebas realizadas en la Fase 1 (muestra las distintas terminales y el Dashboar de Flink).
+├── Imágenes PC Fase 2 (Local).rar  # Contiene imágenes como evidencias del correcto funcionamiento de las pruebas realizadas en la Fase 2 (muestra las distintas terminales y el Dashboar de Flink mostrando la correcta separación de operadores por slot).
+├── Logs PC Fase 1 (Local).rar      # Contiene todos los resultados en crudo en archivos .log totalmente detallados obtenidos en el PC Local durante la Fase 1 (muestra el comportamiento completo del sistema durante las pruebas realizadas).
+├── Logs PC Fase 2 (Local).rar      # Contiene todos los resultados en crudo en archivos .log totalmente detallados obtenidos en el PC Local durante la Fase 2 (muestra el comportamiento completo del sistema durante las pruebas realizadas).
+├── Logs Notebook Fase 1 (Serverless).rar   # Contiene todos los resultados en crudo en archivos .log totalmente detallados obtenidos en el PC Local durante la Fase 1 (estos logs fueron adjuntados solo para demostrar el correcto y real funcionamiento de LocalStack, no aportan datos importantes para análisis).
+└── Diagramas                       # Contiene imágenes con los diagramas de trabajo de cada Fase.
+
